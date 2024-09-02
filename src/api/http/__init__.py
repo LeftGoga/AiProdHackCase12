@@ -1,6 +1,6 @@
 from starlette.templating import Jinja2Templates
 
-from src.api.http.v1.chat import ChatRouter
+from src.api.http.chat import ChatRouter
 from src.core.config import FilesConfig
 from src.services import Services
 

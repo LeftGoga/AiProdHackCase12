@@ -1,3 +1,4 @@
+import logging
 import os
 from uuid import uuid4
 
@@ -20,6 +21,7 @@ class ChatRouter(APIRouter):
         templates: Jinja2Templates,
         files_config: FilesConfig,
     ):
+        self.logger = logging.getLogger(self.__class__.__name__)
         super().__init__(prefix="/chat", tags=["chat"])
         self.chat_service = chat_service
         self.templates = templates
@@ -36,7 +38,7 @@ class ChatRouter(APIRouter):
         self, text: str = Form(...), files: list[UploadFile] = File(None)
     ):
         message = Message(username="User", text=text)
-
+        self.logger.info(f"New message: {message.model_dump(mode='json')}")
         file_urls = []
 
         if files:
