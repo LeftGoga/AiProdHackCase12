@@ -9,15 +9,24 @@
 <body>
     <div class="chat-container">
         <h1>Чат</h1>
-        <div class="messages" id="messages">
+       <div class="messages" id="messages">
             {% for message in messages %}
                 <div class="message">
                     <strong>{{ message.username }}:</strong> {{ message.text }}
+                    {% if message.file_urls %}
+                        <div>
+                            {% for file_url in message.file_urls %}
+                                <div><a href="{{ file_url }}" target="_blank">Скачать файл</a></div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
-        <form id="chat-form" action="/chat/send" method="POST">
+
+        <form id="chat-form" action="/chat/send" method="POST" enctype="multipart/form-data">
             <input type="text" name="text" placeholder="Ваше сообщение" required>
+            <input type="file" name="files" multiple>
             <button type="submit">Отправить</button>
         </form>
     </div>
@@ -33,13 +42,18 @@
                 body: formData
             }).then(response => response.json())
               .then(data => {
-                  // Обновить интерфейс с новым сообщением (например, добавляем в DOM)
                   const messagesDiv = document.getElementById('messages');
                   const newMessage = document.createElement('div');
                   newMessage.className = 'message';
                   newMessage.innerHTML = `<strong>User:</strong> ${data.text}`;
+
+                  if (data.file_urls) {
+                      const fileLinks = data.file_urls.map(fileUrl => `<div><a href="${fileUrl}" target="_blank">Скачать файл</a></div>`).join('');
+                      newMessage.innerHTML += fileLinks;
+                  }
+
                   messagesDiv.appendChild(newMessage);
-                  form.reset(); // Очистка формы
+                  form.reset();
               });
         };
     </script>

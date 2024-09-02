@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings
 class FilesConfig(BaseSettings):
     static_path: str = "static"
     template_path: str = "templates"
+    uploads_path: str = "files/uploads"
 
 
 class AppConfig(BaseSettings):

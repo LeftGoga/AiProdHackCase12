@@ -4,7 +4,6 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
-from starlette.templating import Jinja2Templates
 
 from src.api.http import Routers
 from src.core.config import Config
@@ -22,11 +21,17 @@ class App(FastAPI):
             allow_methods=["GET", "POST"],
         )
         self.mount(
-            "/static", StaticFiles(directory=config.files.static_path), name="static"
+            f"/{config.files.static_path}",
+            StaticFiles(directory=config.files.static_path),
+            name="static",
         )
-        templates = Jinja2Templates(directory=config.files.template_path)
+        self.mount(
+            f"/{config.files.uploads_path}",
+            StaticFiles(directory=config.files.uploads_path),
+            name="uploads",
+        )
         services = Services()
-        routers = Routers(services, templates)
+        routers = Routers(services, config.files)
         for router in routers.v1:
             self.include_router(router)
 
