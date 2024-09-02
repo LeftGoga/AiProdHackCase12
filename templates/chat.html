@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Чат</h1>
+        <div class="messages" id="messages">
+            {% for message in messages %}
+                <div class="message">
+                    <strong>{{ message.username }}:</strong> {{ message.text }}
+                </div>
+            {% endfor %}
+        </div>
+        <form id="chat-form" action="/chat/send" method="POST">
+            <input type="text" name="text" placeholder="Ваше сообщение" required>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  // Обновить интерфейс с новым сообщением (например, добавляем в DOM)
+                  const messagesDiv = document.getElementById('messages');
+                  const newMessage = document.createElement('div');
+                  newMessage.className = 'message';
+                  newMessage.innerHTML = `<strong>User:</strong> ${data.text}`;
+                  messagesDiv.appendChild(newMessage);
+                  form.reset(); // Очистка формы
+              });
+        };
+    </script>
+</body>
+</html>
