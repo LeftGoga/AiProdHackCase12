@@ -1,12 +1,11 @@
-import logging
+import asyncio
 import os
+import base64
+import logging
 from uuid import uuid4
-
-from fastapi import APIRouter, Form, UploadFile, File
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 from starlette.templating import Jinja2Templates
-
 from src.core.config import FilesConfig
 from src.core.dto.message import Message
 from src.services.chat import ChatService
@@ -27,38 +26,47 @@ class ChatRouter(APIRouter):
         self.templates = templates
         self.files_config = files_config
         self.add_api_route("/", self.get_chat, methods=["GET"])
-        self.add_api_route("/send", self.send_message, methods=["POST"])
+        self.add_api_websocket_route("/ws", self.websocket_endpoint)
 
     async def get_chat(self, request: Request):
         return self.templates.TemplateResponse(
             "chat.html", {"request": request, "messages": messages}
         )
 
-    async def send_message(
-        self, text: str = Form(...), files: list[UploadFile] = File(None)
-    ):
-        message = Message(username="User", text=text)
-        self.logger.info(f"New message: {message.model_dump(mode='json')}")
-        file_urls = []
+    async def websocket_endpoint(self, websocket: WebSocket):
+        await websocket.accept()
+        self.logger.info("WebSocket accepted")
 
-        if files:
-            for file in files:
-                if not file.size:
-                    continue
-                file_extension = file.filename.split(".")[-1]
-                unique_filename = f"{uuid4()}.{file_extension}"
-                file_path = os.path.join(
-                    self.files_config.uploads_path, unique_filename
-                )
+        try:
+            while True:
+                message_data = await websocket.receive_json()
 
-                with open(file_path, "wb") as f:
-                    f.write(await file.read())
+                text = message_data.get("text", "")
 
-                file_url = f"/files/uploads/{unique_filename}"
-                file_urls.append(file_url)
+                file_urls = []
+                files = message_data.get("files", [])
+                for file in files:
+                    filename = file["filename"]
+                    content_base64 = file["content"]
+                    unique_filename = f"{uuid4()}_{filename}"
+                    file_path = os.path.join(
+                        self.files_config.uploads_path, unique_filename
+                    )
 
-        if file_urls:
-            message.file_urls = file_urls
+                    file_content = base64.b64decode(content_base64)
+                    with open(file_path, "wb") as f:
+                        f.write(file_content)
 
-        messages.append(message)
-        return JSONResponse(message.model_dump(mode="json"))
+                    file_urls.append(f"/files/uploads/{unique_filename}")
+
+                message = Message(username="User", text=text, file_urls=file_urls)
+                messages.append(message)
+
+                await websocket.send_json(message.model_dump(mode="json"))
+
+                await asyncio.sleep(1)
+                ai_response = Message(username="AI", text="Hey there!")
+                await websocket.send_json(ai_response.model_dump(mode="json"))
+
+        except WebSocketDisconnect:
+            self.logger.warning("WebSocket disconnected")

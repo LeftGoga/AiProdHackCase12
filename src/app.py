@@ -18,7 +18,9 @@ class App(FastAPI):
         self.add_middleware(
             CORSMiddleware,
             allow_origins=self.config.origins,
-            allow_methods=["GET", "POST"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
         )
         self.mount(
             f"/{config.files.static_path}",
