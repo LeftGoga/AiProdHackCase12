@@ -60,9 +60,11 @@ def json_converter(raw_text:str, file_path:str, page_number:int, doc_type='text'
 
     return json_object
 
-def process_pdf(pdf_path:str):
+def process_pdf(pdf_path:str)->dict:
+    """
+    Считывает текст вне таблиц с помощью Tesseract и возвращает его внутри JSON с метаданными
+    """
     # Конвертируем страницы PDF в изображения
-    start = time()
     images = convert_from_path(pdf_path, poppler_path=poppler_path, dpi=300)
     output_json = []
     for page_num, image in enumerate(images):
@@ -70,19 +72,14 @@ def process_pdf(pdf_path:str):
         image_without_tables = detect_and_remove_tables(image)
         
         # Применяем OCR к изображению без таблиц
-        # print('begin')
         text = pytesseract.image_to_string(image_without_tables, lang='rus+eng')
-        # if len(text) > 0:
-        output_json.append(json_converter(text[:20], pdf_path, page_num + 1))
-        # else:
-            # pass
-        # print('end')
-    end = time()
-    print(end - start)
+        if len(text) > 0:
+            output_json.append(json_converter(text, pdf_path, page_num + 1))
+        else:
+            pass
     return output_json
 
 
-print(process_pdf(pdf_path))
 
 
 
