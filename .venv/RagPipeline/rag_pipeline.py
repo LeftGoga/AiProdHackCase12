@@ -82,5 +82,7 @@ if __name__ =="__main__":
     test.preprocess_single(file)
     retr = test.as_retriever()
     print(retr.get_relevant_documents("арматурная сталь"))
+    print(len(test.vectorstore.get()['documents']))
+
 
 

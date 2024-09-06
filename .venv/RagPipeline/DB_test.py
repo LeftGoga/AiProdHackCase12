@@ -1,5 +1,10 @@
 from db_connector import db_connector
 import os
+
+
+
+
+
 con = db_connector()
 con.create_db(db_path = os.getcwd()+"/DataBase")
 con.create_or_get("test")
