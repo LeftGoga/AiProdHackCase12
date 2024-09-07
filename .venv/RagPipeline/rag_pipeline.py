@@ -7,6 +7,8 @@ from uuid import uuid1
 from db_connector import db_connector
 from langchain_chroma import Chroma
 import os
+import warnings
+warnings.filterwarnings('ignore')
 class full_pipeline:
     def __init__(self,client,embed_fun=HuggingFaceEmbeddings(model_name = "cointegrated/rubert-tiny2")):
         self.embed_fun=embed_fun
@@ -20,7 +22,7 @@ class full_pipeline:
         :return: список документов, созданых из чанка страницы
         '''
 
-        text_splitter = SemanticChunker(self.embed_fun)
+        text_splitter = SemanticChunker(self.embed_fun, breakpoint_threshold_type="standard_deviation")
         texts = text_splitter.create_documents([data["raw_text"]])
         all_docs = []
         for i in range(len(texts)):
@@ -81,8 +83,18 @@ if __name__ =="__main__":
 
     test.preprocess_single(file)
     retr = test.as_retriever()
-    print(retr.get_relevant_documents("арматурная сталь"))
-    print(len(test.vectorstore.get()['documents']))
+    print("Запрос:  ГОСТ 5781-82")
+    print("\n")
+    print("Нужный чанк: ")
+    print(retr.get_relevant_documents("ГОСТ 5781-8 2")[0].page_content)
+    print("\n")
+    print("Метаданные: ")
+    print(retr.get_relevant_documents(" ГОСТ 5781-8 2")[0].metadata)
+
+    print("\n")
+    print("Размеры БД: ")
+    print(len(test.vectorstore.get()["documents"]))
+
 
 
 
