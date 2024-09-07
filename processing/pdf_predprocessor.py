@@ -4,9 +4,11 @@ from pdf2image import convert_from_path
 import pytesseract
 import PyPDF2
 from PIL import Image as PILImage
+from tables_predprocessor import PDFTableExtractor
 import os
 import re
 import json
+import difflib
 
 class PDFProcessor:
     def __init__(self, tesseract_cmd='', poppler_path=''):
