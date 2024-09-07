@@ -1,6 +1,5 @@
 import chromadb as cdb
 import os.path
-
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 class db_connector:

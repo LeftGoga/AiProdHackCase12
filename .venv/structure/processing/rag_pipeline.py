@@ -3,7 +3,6 @@ from langchain_experimental.text_splitter import SemanticChunker
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 import json
-
 from uuid import uuid1
 from db_connector import db_connector
 from langchain_chroma import Chroma
