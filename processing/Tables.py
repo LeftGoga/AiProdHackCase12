@@ -118,18 +118,20 @@ class PDFTableExtractor:
         tables_json = self.extract_tables_from_pdf(pdf_path, page_num)
         if not tables_json:
             return "Таблицы не найдены на указанной странице."
-        
-        coordinates = tables_json[0]["координаты таблицы"]
-        table_image = self.extract_table_image(pdf_path, page_num, coordinates)
-        
-        ocr_text = pytesseract.image_to_string(table_image, lang='rus+eng')
-        return ocr_text
+        tables_text_list = []
+        for i in range(len(tables_json)):
+            coordinates = tables_json[i]["координаты таблицы"]
+            table_image = self.extract_table_image(pdf_path, page_num, coordinates)
+            
+            ocr_text = pytesseract.image_to_string(table_image, lang='rus+eng')
+            tables_text_list+=[ocr_text]
+        return tables_text_list.copy()
 
 if __name__ == "__main__":
     output_dir = "extracted_tables"
     extractor = PDFTableExtractor(output_dir)
     
-    pdf_path = "test3.pdf"
+    pdf_path = "example.pdf"
     page_num = 7
     tables_json = extractor.extract_tables_from_pdf(pdf_path, page_num, combine_tables=True)
     print(tables_json)
