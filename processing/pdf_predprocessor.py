@@ -4,7 +4,7 @@ from pdf2image import convert_from_path
 import pytesseract
 import PyPDF2
 from PIL import Image as PILImage
-from tables_predprocessor import PDFTableExtractor
+from processing.tables_predprocessor import PDFTableExtractor
 import os
 import re
 import json
