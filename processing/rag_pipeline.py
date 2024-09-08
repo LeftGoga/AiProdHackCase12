@@ -7,8 +7,11 @@ from uuid import uuid1
 from db_connector import db_connector
 from langchain_chroma import Chroma
 import os
+import warnings
+warnings.filterwarnings('ignore')
+
 class full_pipeline:
-    def __init__(self,client,embed_fun=HuggingFaceEmbeddings(model_name = "cointegrated/rubert-tiny2")):
+    def __init__(self,client,embed_fun=HuggingFaceEmbeddings(model_name = "ai-forever/sbert_large_nlu_ru")):
         self.embed_fun=embed_fun
         self.vectorstore = client.as_vector()
 
@@ -20,7 +23,7 @@ class full_pipeline:
         :return: список документов, созданых из чанка страницы
         '''
 
-        text_splitter = SemanticChunker(self.embed_fun)
+        text_splitter = SemanticChunker(self.embed_fun, breakpoint_threshold_type="standard_deviation")
         texts = text_splitter.create_documents([data["raw_text"]])
         all_docs = []
         for i in range(len(texts)):
@@ -41,6 +44,11 @@ class full_pipeline:
 
         uuids = [str(uuid1()) for _ in range(len(docs))]
         self.vectorstore.add_documents(documents=docs, ids=uuids)
+
+    def preprocess_page(self,page):
+        docs = self.create_docs(page)
+        self.storing(docs)
+
 
     def preprocess_single(self,json):
 
@@ -81,8 +89,11 @@ if __name__ =="__main__":
 
     test.preprocess_single(file)
     retr = test.as_retriever()
-    print(retr.get_relevant_documents("арматурная сталь"))
-    print(len(test.vectorstore.get()['documents']))
+    print("Запрос:  методика обработка стали")
+    print("\n")
+    print("Нужный чанк: ")
+    print(retr.get_relevant_documents("методика обработка стали")[0].page_content)
+
 
 
 
