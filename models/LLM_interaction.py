@@ -51,9 +51,10 @@ class llm_inter:
     Обычная ллм
     '''
     def __init__(self, model_name, retr):
+        self.retr = retr
         self.chain = (
                 {
-                    "context": retr | self.format_docs,
+                    "context": self.retr | self.format_docs,
                     "question": RunnablePassthrough(),
                 }
                 | self.default_prompt()
@@ -66,9 +67,15 @@ class llm_inter:
 
     def chat(self, query):
         ans = self.chain.invoke(query)
-        pos = ans.find('\n\nОтвет:')
+
         return ans.replace("\n\n", "").replace(" Нет информации.", "")
 
+    def get_meta(self,q):
+        docs = self.retr.get_relevant_documents(q)
+        metadata = []
+        for i in docs:
+            metadata.append(i.metadata)
+        return metadata
     def create_pipeline(self, model_name):
 
         model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage= True)
