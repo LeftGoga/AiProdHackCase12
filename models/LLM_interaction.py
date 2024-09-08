@@ -70,14 +70,11 @@ class llm_inter:
         return ans.replace("\n\n", "").replace(" Нет информации.", "")
 
     def create_pipeline(self, model_name):
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True, bnb_4bit_use_double_quant=True, bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.bfloat16
-        )
 
-        tokenizer = AutoTokenizer.from_pretrained(model_name, quantization_config=bnb_config)
+        model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage= True)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, low_cpu_mem_usage=True)
 
-        model = AutoModelForCausalLM.from_pretrained(model_name)
+
 
         pipe = pipeline(
             "text-generation", model=model, tokenizer=tokenizer, max_new_tokens=512, return_full_text=False
