@@ -1,4 +1,4 @@
-from langchain_community.document_loaders import TextLoader
+
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
@@ -9,6 +9,7 @@ from langchain_chroma import Chroma
 import os
 import warnings
 warnings.filterwarnings('ignore')
+
 
 class full_pipeline:
     def __init__(self,client,embed_fun=HuggingFaceEmbeddings(model_name = "ai-forever/sbert_large_nlu_ru")):
@@ -46,6 +47,12 @@ class full_pipeline:
         self.vectorstore.add_documents(documents=docs, ids=uuids)
 
     def preprocess_page(self,page):
+
+        '''
+        сторит 1 страницу пдфки
+        :param page:
+        :return:
+        '''
         docs = self.create_docs(page)
         self.storing(docs)
 
@@ -93,6 +100,7 @@ if __name__ =="__main__":
     print("\n")
     print("Нужный чанк: ")
     print(retr.get_relevant_documents("методика обработка стали")[0].page_content)
+
 
 
 
