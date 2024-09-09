@@ -78,10 +78,3 @@ def process_pdf(pdf_path:str)->dict:
         else:
             pass
     return output_json
-
-
-
-
-
-# Путь и номер страницы
-# 
