@@ -12,11 +12,12 @@ warnings.filterwarnings('ignore')
 
 
 class full_pipeline:
-    def __init__(self,client,embed_fun=HuggingFaceEmbeddings(model_name = "ai-forever/sbert_large_nlu_ru")):
+    def __init__(self,client,embed_fun=HuggingFaceEmbeddings(model_name = "deepvk/USER-bge-m3")):
         self.embed_fun=embed_fun
         self.vectorstore = client.as_vector()
 
     def create_docs(self, data):
+
         '''
         Чанкует 1 страницу документа
 
@@ -77,6 +78,12 @@ class full_pipeline:
             self.preprocess_single(list_of_json[i])
 
     def as_retriever(self,k=1):
+
+        """
+        Возвращает ретриве
+        :param k: сколько доков возвращать
+        :return:
+        """
         return self.vectorstore.as_retriever(search_kwargs={"k": k})
 
 

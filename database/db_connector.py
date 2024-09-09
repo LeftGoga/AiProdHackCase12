@@ -12,7 +12,7 @@ class db_connector:
                 self.client = None
                 self.coll = None
                 self.coll_list = []
-                self.embed_fun = HuggingFaceEmbeddings(model_name = "cointegrated/rubert-tiny2")
+                self.embed_fun = HuggingFaceEmbeddings(model_name = "deepvk/USER-bge-m3")
         def create_db(self,db_path):
 
                 self.client = cdb.PersistentClient(path = db_path,settings = cdb.config.Settings(allow_reset=True)
@@ -21,7 +21,7 @@ class db_connector:
 
 
         def set_coll(self,name):
-                self.coll = create_or_get(name)
+                self.coll = self.create_or_get(name)
 
         def create_or_get(self,name):
                 if self.embed_fun:

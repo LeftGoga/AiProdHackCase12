@@ -17,14 +17,26 @@ from langchain_core.runnables import RunnablePassthrough
 
 class multimodal_llm_inter:
 
-    '''
-    Мультимодалка
-    '''
+
     def __init__(self,model_dir):
+        '''
+        Мультимодалка,
+        :param model_dir: Принимает название модельки(или ее директорию)
+        '''
         self.model = AutoModel.from_pretrained(model_dir, trust_remote_code=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
 
     def chat(self, question,prompt,images = None,temp = 0.1,sampling =True):
+
+        """
+        Гененерация от модельки, прнимает опрос плюс промпт. С промптом пока не тестил вроде, возможно будут баги
+        :param question:
+        :param prompt:
+        :param images: если несколько -проходи по всем
+        :param temp:
+        :param sampling:
+        :return:
+        """
         img_lst = []
         if images:
             for i in images:
@@ -47,10 +59,12 @@ class multimodal_llm_inter:
 
 class llm_inter:
 
-    '''
-    Обычная ллм
-    '''
+
     def __init__(self, model_name, retr):
+        '''
+        Обычная ллм
+        принимает название(или директорию модели?) и ретривер
+        '''
         self.retr = retr
         self.chain = (
                 {
@@ -92,6 +106,11 @@ class llm_inter:
         return hf
 
     def default_prompt(self):
+        """
+        Пока костыльно пропмт прикрутил, если че поменяит иуи
+        :return:
+        """
+
         prompt_template = """Ты - эксперт по нормативной документации. Используя контекст, предложенный далее, ответь на вопрос и один ответ в конце. Придерживайся следующих правил:
         1. Если не найдешь ответа, не пытайся придумать ответ. Просто напиши "Нет информации" 
         2. Если вы нашли ответ, запишите его кратко
