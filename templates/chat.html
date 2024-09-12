@@ -34,7 +34,7 @@
     <script>
         const form = document.getElementById('chat-form');
         const messagesDiv = document.getElementById('messages');
-        const ws = new WebSocket("ws://127.0.0.1:8888/chat/ws");
+        const ws = new WebSocket("ws://51.250.87.4:8888/chat/ws");
 
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);

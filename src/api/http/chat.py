@@ -39,7 +39,7 @@ class ChatRouter(APIRouter):
         try:
             while True:
                 message_data = await websocket.receive_json()
-
+                self.logger.info("New Message")
                 text = message_data.get("text", "")
 
                 file_urls = []
@@ -68,7 +68,10 @@ class ChatRouter(APIRouter):
                     Prompt(text=text, file_paths=file_paths)
                 )
                 ai_response = Message(username="AI", text=ai_answer)
+                messages.append(ai_response)
                 await websocket.send_json(ai_response.model_dump(mode="json"))
+                
+
 
         except WebSocketDisconnect:
             self.logger.warning("WebSocket disconnected")

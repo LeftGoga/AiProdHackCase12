@@ -14,7 +14,7 @@ from src.services.file_processing.rag_pipeline import RAGPipeline
 class AIService:
     def __init__(
         self,
-        db_path="/home/aiproducttest/AiProdHackCase12-1_Copy/AiProdHackCase12-1/db",
+        db_path="/home/aiproducttest/AiProdHackCase12/db",
         k=2,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -36,45 +36,35 @@ class AIService:
         page_doc = {"Doc": [], "Page": []}
         prompts = ""
         for i, item in enumerate(ret_doc):
+            page_doc["Doc"].append(str(item.metadata["file_name"]))
+            page_doc["Page"].append(str(item.metadata["page_number"]))
             if item.metadata["doc_type"] == "table":
-                page_doc["Doc"].append(item.metadata["file_name"])
-                page_doc["Page"].append(item.metadata["page_number"])
                 imgs.append((item.metadata["page_number"], item.metadata["file_name"]))
             else:
-                page_doc["Doc"].append(item.metadata["file_name"])
-                page_doc["Page"].append(item.metadata["page_number"])
                 prompts += "\n\n" + item.page_content
+        
         if imgs:
-            print("multimodal")
+            self.logger.info("multimodal")
             images = self.get_imgs_pathes(imgs)
-            ans = (
-                self.multimodal.answer(images, q)
-                + "\n"
-                + "Откуда взято: "
-                + "\n"
-                + str(page_doc["Doc"])
-                + "\n"
-                + str(page_doc["Page"])
-            )
-
+            text = self.multimodal.answer(images, q)
         else:
-            print("simple llm")
-            ans = (
-                self.llm.chat(q)
-                + "\n"
-                + "Откуда взято: "
-                + "\n"
-                + str(page_doc["Doc"])
-                + "\n"
-                + str(page_doc["Page"])
-            )
+            self.logger.info("simple llm")
+            text = self.llm.chat(q)
+        ans = (
+            text
+            + "<br><br>"
+            + "Откуда взято: "
+            + "<br>"
+            + ", ".join([f"{d} (Стр. {p})" for d, p in zip(page_doc["Doc"], page_doc["Page"])])
+        )
+
         return ans
 
     @staticmethod
     def get_imgs_pathes(imgs):
         img_pathes = []
         for i in imgs:
-            path_doc = f"/home/aiproducttest/AiProdHackCase12-1_Copy/AiProdHackCase12-1/data/documents/{i[1]}.pdf"
+            path_doc = f"/home/aiproducttest/AiProdHackCase12/data/documents/{i[1]}.pdf"
 
             page = convert_from_path(path_doc, first_page=i[0], last_page=i[0], dpi=300)
 

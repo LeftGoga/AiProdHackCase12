@@ -5,8 +5,8 @@ import json
 class YandexTranslator:
     def __init__(
         self,
-        api_key="AQVN3nS4abMnLQnzj0cx7iI-WF-6LFXHVzrU6y6S",
-        api_id="ajeueis6jcp75k4v73q7",
+        api_key="AQVN0XyMgY6NL_bWEWsBxiH5TBGTxzRqsrWkjSEg",
+        api_id="ajehfi6833kd5vrdc4bb",
         folder_id="b1gjj01i0f670l2o8hrs",
         target_language="ru",
     ):

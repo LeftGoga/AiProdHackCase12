@@ -28,11 +28,11 @@ class LLMInteraction:
 
         index = ans.find("Вопрос:")
         if index != -1:
-            ans_cut = ans[: index + len("Вопрос:")]
-            return ans_cut
+            ans_cut = ans[:index + len("Вопрос:")]
+            return ans_cut.replace("Вопрос:","")
         else:
-            return ans
-
+            return ans.replace("Вопрос:","" )
+    
     @staticmethod
     def create_pipeline(model_name):
         tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -54,7 +54,7 @@ class LLMInteraction:
     @staticmethod
     def default_prompt():
         prompt_template = """Ты - эксперт по нормативной документации. Используя контекст, предложенный далее, ответь на вопрос и один ответ в конце. Придерживайся следующих правил:
-        1. Если не найдешь ответа, не пытайся придумать ответ. Просто напиши "Нет информации". 
+        1. Если не найдешь ответа, не пытайся придумать ответ. 
         2. Если вы нашли ответ, запишите его кратко
         3. Если ответила на вопрос пользователя - прекращай свою работу. 
 

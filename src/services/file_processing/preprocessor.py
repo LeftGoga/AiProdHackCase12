@@ -1,6 +1,6 @@
 from src.services.file_processing.doc import DocProcessor
 from src.services.file_processing.pdf import PDFProcessor
-from src.processing.tables_predprocessor import PDFTableExtractor
+from src.services.file_processing.pdf_tables import PDFTableExtractor
 from src.services.llm_models.multimodal_llamma_cpm import MultimodalLlammaCPM
 import os
 import PyPDF2

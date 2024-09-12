@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModel, AutoTokenizer
-from models.llm_translator import YandexTranslate
+from .translator import YandexTranslator
 
 
 class MultimodalLlammaCPM:
@@ -18,8 +18,8 @@ class MultimodalLlammaCPM:
         self.question = """You need an unambiguous detailed description of the table contents to upload to the database in the Table Data Description column. Pay attention to the column names and row names!!! 
     HERE THE MAIN PART: Give answer in english. Do not translate to english Russian terms!!!"""
 
-        self.ruen_translator = YandexTranslate(target_language="en")
-        self.enru_translator = YandexTranslate(target_language="ru")
+        self.ruen_translator = YandexTranslator(target_language="en")
+        self.enru_translator = YandexTranslator(target_language="ru")
 
     def generate_summary(self, image_paths, promt=""):
         # Load the image
