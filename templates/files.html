@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка файлов</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='files.css') }}">
+</head>
+<body>
+    <div class="upload-container">
+        <h1>Загрузка файлов</h1>
+        <form id="upload-form" action="/files/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="files" id="file-input" required multiple>
+            <button type="submit">Загрузить</button>
+        </form>
+        <div id="upload-status"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('upload-form');
+        const statusDiv = document.getElementById('upload-status');
+
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            fetch('/files/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusDiv.innerHTML = '<p>Файлы успешно загружены:</p>';
+                    data.file_urls.forEach(url => {
+                        statusDiv.innerHTML += `<p><a href="${url}" target="_blank">${url}</a></p>`;
+                    });
+                } else {
+                    statusDiv.innerHTML = `<p>Ошибка: ${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                statusDiv.innerHTML = `<p>Ошибка при загрузке файла: ${error.message}</p>`;
+            });
+        };
+    </script>
+</body>
+</html>
