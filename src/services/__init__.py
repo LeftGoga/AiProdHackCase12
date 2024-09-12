@@ -1,8 +1,6 @@
-from src.services.chat import ChatService
-from src.services.files import FileService
+from src.services.ai import AIService
 
 
 class Services:
     def __init__(self):
-        self.chat = ChatService()
-        self.files = FileService()
+        self.ai = AIService()

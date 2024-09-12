@@ -10,6 +10,6 @@ class Routers:
     def __init__(self, services: Services, files_config: FilesConfig):
         templates = Jinja2Templates(directory=files_config.template_path)
         self.v1 = [
-            ChatRouter(services.chat, templates, files_config=files_config),
-            FileRouter(services.files, templates, files_config=files_config),
+            ChatRouter(services.ai, templates, files_config=files_config),
+            FileRouter(services.ai, templates, files_config=files_config),
         ]

@@ -8,19 +8,19 @@ from starlette.responses import JSONResponse
 from starlette.templating import Jinja2Templates
 
 from src.core.config import FilesConfig
-from src.services import FileService
+from src.services import AIService
 
 
 class FileRouter(APIRouter):
     def __init__(
         self,
-        file_service: FileService,
+        service: AIService,
         templates: Jinja2Templates,
         files_config: FilesConfig,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
         super().__init__(prefix="/files", tags=["files"])
-        self.file_service = file_service
+        self.service = service
         self.templates = templates
         self.files_config = files_config
         self.add_api_route("/", self.get_upload_page, methods=["GET"])
@@ -45,7 +45,7 @@ class FileRouter(APIRouter):
                 file_paths.append(file_path)
                 file_urls.append(f"/files/uploads/{unique_filename}")
 
-            self.file_service.upload_files(file_paths)
+            self.service.add_to_db(file_paths)
 
             return JSONResponse({"success": True, "file_urls": file_urls})
 
