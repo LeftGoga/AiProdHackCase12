@@ -1,14 +1,13 @@
-
+from langchain_community.document_loaders import TextLoader
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 import json
 from uuid import uuid1
-from db_connector import db_connector
+from database.db_connector import db_connector
 from langchain_chroma import Chroma
 import os
 import warnings
-warnings.filterwarnings('ignore')
 
 
 class full_pipeline:
@@ -17,7 +16,6 @@ class full_pipeline:
         self.vectorstore = client.as_vector()
 
     def create_docs(self, data):
-
         '''
         Чанкует 1 страницу документа
 
@@ -47,17 +45,6 @@ class full_pipeline:
         uuids = [str(uuid1()) for _ in range(len(docs))]
         self.vectorstore.add_documents(documents=docs, ids=uuids)
 
-    def preprocess_page(self,page):
-
-        '''
-        сторит 1 страницу пдфки
-        :param page:
-        :return:
-        '''
-        docs = self.create_docs(page)
-        self.storing(docs)
-
-
     def preprocess_single(self,json):
 
         '''
@@ -78,37 +65,16 @@ class full_pipeline:
             self.preprocess_single(list_of_json[i])
 
     def as_retriever(self,k=1):
-
-        """
-        Возвращает ретриве
-        :param k: сколько доков возвращать
-        :return:
-        """
         return self.vectorstore.as_retriever(search_kwargs={"k": k})
 
+    def preprocess_page(self,page):
 
-
-
-
-
-
-
-if __name__ =="__main__":
-    with open('parsed_output.json') as f:
-        file = json.load(f)
-        f.close()
-    con = db_connector()
-    con.create_db(db_path=os.getcwd() + "/DataBase")
-    test = full_pipeline(con)
-
-    test.preprocess_single(file)
-    retr = test.as_retriever()
-    print("Запрос:  методика обработка стали")
-    print("\n")
-    print("Нужный чанк: ")
-    print(retr.get_relevant_documents("методика обработка стали")[0].page_content)
-
-
-
+        '''
+        сторит 1 страницу пдфки
+        :param page:
+        :return:
+        '''
+        docs = self.create_docs(page)
+        self.storing(docs)
 
 

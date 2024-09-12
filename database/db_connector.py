@@ -17,7 +17,6 @@ class db_connector:
 
                 self.client = cdb.PersistentClient(path = db_path,settings = cdb.config.Settings(allow_reset=True)
                                                   )
-                self.reset_db()
 
 
         def set_coll(self,name):

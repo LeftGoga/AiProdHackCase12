@@ -1,9 +1,5 @@
-import langchain
-import torch
-from PIL import Image
-from transformers import AutoModel, AutoTokenizer
 from langchain.prompts import PromptTemplate
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoTokenizer
 from langchain.prompts import PromptTemplate
 from transformers import BitsAndBytesConfig
 from transformers import AutoModelForCausalLM
@@ -13,62 +9,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
 
-
-
-class multimodal_llm_inter:
-
-
-    def __init__(self,model_dir):
-        '''
-        Мультимодалка,
-        :param model_dir: Принимает название модельки(или ее директорию)
-        '''
-        self.model = AutoModel.from_pretrained(model_dir, trust_remote_code=True)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
-
-    def chat(self, question,prompt,images = None,temp = 0.1,sampling =True):
-
-        """
-        Гененерация от модельки, прнимает опрос плюс промпт. С промптом пока не тестил вроде, возможно будут баги
-        :param question:
-        :param prompt:
-        :param images: если несколько -проходи по всем
-        :param temp:
-        :param sampling:
-        :return:
-        """
-        img_lst = []
-        if images:
-            for i in images:
-                image = Image.open(i).convert('RGB')
-                img_lst.append(image)
-            msgs = [{'role': 'user', 'content': [*img_lst, question]}]
-        else:
-            msgs = [{'role': 'user', 'content': [question]}]
-
-        res = self.model.chat(
-            image=None,
-            msgs=msgs,
-            tokenizer=self.tokenizer,
-            sampling=sampling,  # if sampling=False, beam_search will be used by default
-            temperature=temp,
-            system_prompt=prompt # pass system_prompt if needed
-        )
-        return res
-
-
-class llm_inter:
-
-
-    def __init__(self, model_name, retr):
-        '''
-        Обычная ллм
-        принимает название(или директорию модели?) и ретривер
-        '''
-        self.retr = retr
+class llm:
+    def __init__(self, retr, model_name="AnatoliiPotapov/T-lite-instruct-0.1"):
         self.chain = (
                 {
-                    "context": self.retr | self.format_docs,
+                    "context": retr | self.format_docs,
                     "question": RunnablePassthrough(),
                 }
                 | self.default_prompt()
@@ -82,23 +27,23 @@ class llm_inter:
     def chat(self, query):
         ans = self.chain.invoke(query)
 
-        return ans.replace("\n\n", "").replace(" Нет информации.", "")
+        index = ans.find("Вопрос:")
+        if index != -1:
+            ans_cut = ans[:index + len("Вопрос:")]
+            return ans_cut
+        else:
+            return ans
 
-    def get_meta(self,q):
-        docs = self.retr.get_relevant_documents(q)
-        metadata = []
-        for i in docs:
-            metadata.append(i.metadata)
-        return metadata
+
     def create_pipeline(self, model_name):
 
-        model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage= True)
-        tokenizer = AutoTokenizer.from_pretrained(model_name, low_cpu_mem_usage=True)
 
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
 
+        model = AutoModelForCausalLM.from_pretrained(model_name)
 
         pipe = pipeline(
-            "text-generation", model=model, tokenizer=tokenizer, max_new_tokens=512, return_full_text=False
+            "text-generation", model=model, tokenizer=tokenizer, max_new_tokens=256, return_full_text=False,do_sample=True, temperature = 0.1,
         )
         hf = HuggingFacePipeline(
             pipeline=pipe
@@ -106,15 +51,10 @@ class llm_inter:
         return hf
 
     def default_prompt(self):
-        """
-        Пока костыльно пропмт прикрутил, если че поменяит иуи
-        :return:
-        """
-
         prompt_template = """Ты - эксперт по нормативной документации. Используя контекст, предложенный далее, ответь на вопрос и один ответ в конце. Придерживайся следующих правил:
-        1. Если не найдешь ответа, не пытайся придумать ответ. Просто напиши "Нет информации" 
+        1. Если не найдешь ответа, не пытайся придумать ответ. Просто напиши "Нет информации". 
         2. Если вы нашли ответ, запишите его кратко
-        3. Не пиши лишней информации после ответа
+        3. Если ответила на вопрос пользователя - прекращай свою работу. 
 
 
         {context}
