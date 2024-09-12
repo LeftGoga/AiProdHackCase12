@@ -32,7 +32,7 @@ class App(FastAPI):
             StaticFiles(directory=config.files.uploads_path),
             name="uploads",
         )
-        services = Services()
+        services = Services(config.translator)
         routers = Routers(services, config.files)
         for router in routers.v1:
             self.include_router(router)

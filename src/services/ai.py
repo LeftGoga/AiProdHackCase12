@@ -1,6 +1,8 @@
 import logging
 
 import transformers
+
+from src.core.config import TranslatorConfig
 from src.core.database import Database
 from pdf2image import convert_from_path
 
@@ -14,11 +16,12 @@ from src.services.file_processing.rag_pipeline import RAGPipeline
 class AIService:
     def __init__(
         self,
+        translator_config: TranslatorConfig,
         db_path="/home/aiproducttest/AiProdHackCase12/db",
         k=2,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.multimodal = MultimodalLlammaCPM()
+        self.multimodal = MultimodalLlammaCPM(translator_config)
         self.con = Database()
         self.con.create_db(db_path)
         self.retr = self.con.as_retr(k)
@@ -42,7 +45,7 @@ class AIService:
                 imgs.append((item.metadata["page_number"], item.metadata["file_name"]))
             else:
                 prompts += "\n\n" + item.page_content
-        
+
         if imgs:
             self.logger.info("multimodal")
             images = self.get_imgs_pathes(imgs)
@@ -55,7 +58,9 @@ class AIService:
             + "<br><br>"
             + "Откуда взято: "
             + "<br>"
-            + ", ".join([f"{d} (Стр. {p})" for d, p in zip(page_doc["Doc"], page_doc["Page"])])
+            + ", ".join(
+                [f"{d} (Стр. {p})" for d, p in zip(page_doc["Doc"], page_doc["Page"])]
+            )
         )
 
         return ans

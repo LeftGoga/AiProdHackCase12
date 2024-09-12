@@ -1,10 +1,13 @@
 import torch
 from transformers import AutoModel, AutoTokenizer
 from .translator import YandexTranslator
+from ...core.config import TranslatorConfig
 
 
 class MultimodalLlammaCPM:
-    def __init__(self, model_name="openbmb/MiniCPM-V-2_6"):
+    def __init__(
+        self, translator_config: TranslatorConfig, model_name="openbmb/MiniCPM-V-2_6"
+    ):
         self.model = AutoModel.from_pretrained(
             model_name,
             trust_remote_code=True,
@@ -18,8 +21,18 @@ class MultimodalLlammaCPM:
         self.question = """You need an unambiguous detailed description of the table contents to upload to the database in the Table Data Description column. Pay attention to the column names and row names!!! 
     HERE THE MAIN PART: Give answer in english. Do not translate to english Russian terms!!!"""
 
-        self.ruen_translator = YandexTranslator(target_language="en")
-        self.enru_translator = YandexTranslator(target_language="ru")
+        self.ruen_translator = YandexTranslator(
+            api_key=translator_config.api_key,
+            api_id=translator_config.api_id,
+            folder_id=translator_config.folder_id,
+            target_language="en",
+        )
+        self.enru_translator = YandexTranslator(
+            api_key=translator_config.api_key,
+            api_id=translator_config.api_id,
+            folder_id=translator_config.folder_id,
+            target_language="ru",
+        )
 
     def generate_summary(self, image_paths, promt=""):
         # Load the image
