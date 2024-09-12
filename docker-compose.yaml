@@ -8,3 +8,4 @@ services:
       context: .
     ports:
       - "${APP_PORT}:${APP_PORT}"
+
