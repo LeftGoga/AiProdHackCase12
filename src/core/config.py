@@ -16,8 +16,15 @@ class AppConfig(BaseSettings):
     origins: list[str] = Field(alias="APP_ORIGINS")
 
 
+class TranslatorConfig(BaseSettings):
+    api_key: str = Field(alias="TRANSLATOR_KEY")
+    api_id: str = Field(alias="TRANSLATOR_ID")
+    folder_id: str = Field(alias="TRANSLATOR_FOLDER")
+
+
 class Config:
     def __init__(self, env_path: str = "./.env"):
         load_dotenv(env_path)
         self.app = AppConfig()
         self.files = FilesConfig()
+        self.translator = TranslatorConfig()
