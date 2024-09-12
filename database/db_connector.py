@@ -15,8 +15,7 @@ class db_connector:
                 self.embed_fun = HuggingFaceEmbeddings(model_name = "deepvk/USER-bge-m3")
         def create_db(self,db_path):
 
-                self.client = cdb.PersistentClient(path = db_path,settings = cdb.config.Settings(allow_reset=True)
-                                                  )
+                self.client = cdb.PersistentClient(path = db_path,settings = cdb.config.Settings(allow_reset=True))
 
 
         def set_coll(self,name):
@@ -24,7 +23,7 @@ class db_connector:
 
         def create_or_get(self,name):
                 if self.embed_fun:
-                        self.coll = self.client.get_or_create_collection(name = name,embedding_function=embedding_function)
+                        self.coll = self.client.get_or_create_collection(name = name,embedding_function=self.embed_fun)
                 else:
                         self.coll = self.client.get_or_create_collection(name=name)
                 self.coll_list.append(name)
@@ -66,3 +65,5 @@ class db_connector:
                         )
 
                 return vector
+        def as_retr(self, k=1):
+                return self.as_vector().as_retriever(search_kwargs={"k": k})
