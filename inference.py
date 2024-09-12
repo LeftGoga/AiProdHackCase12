@@ -11,7 +11,8 @@ from processing.rag_pipeline import full_pipeline
 class Inference:
     def __init__(self,db_path="/home/aiproducttest/AiProdHackCase12-1_Copy/AiProdHackCase12-1/database/db",k=2):
         self.multimodal = MultimodalLlammaCPM()
-        self.con =db_connector().create_db(db_path)
+        self.con = db_connector()
+        self.con.create_db(db_path)
         self.retr = self.con.as_retr(k)
         self.llm = llm(self.retr)
         transformers.set_seed(42)
