@@ -21,6 +21,7 @@ class AIService:
         k=2,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.translator_config = translator_config
         self.multimodal = MultimodalLlammaCPM(translator_config)
         self.con = Database()
         self.con.create_db(db_path)
@@ -79,7 +80,7 @@ class AIService:
 
     def add_to_db(self, file_paths: list[str]):
         test = RAGPipeline(self.con)
-        prep = Preprocessor(test)
+        prep = Preprocessor(test, self.translator_config)
         for file_path in file_paths:
             prep.process_file(file_path)
 
