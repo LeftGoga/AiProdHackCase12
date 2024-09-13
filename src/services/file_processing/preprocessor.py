@@ -1,3 +1,4 @@
+from src.core.config import TranslatorConfig
 from src.services.file_processing.doc import DocProcessor
 from src.services.file_processing.pdf import PDFProcessor
 from src.services.file_processing.pdf_tables import PDFTableExtractor
@@ -9,11 +10,11 @@ import datetime
 
 
 class Preprocessor:
-    def __init__(self, rag_pp):
+    def __init__(self, rag_pp, translator_config: TranslatorConfig):
         self.doc_processor = DocProcessor()
         self.pdf_processor = PDFProcessor()
         self.pdf_table_extractor = PDFTableExtractor()
-        self.llama_cpm = MultimodalLlammaCPM()
+        self.llama_cpm = MultimodalLlammaCPM(translator_config)
         self.rag_pp = rag_pp
 
     def process_file(self, file_path):
