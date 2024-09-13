@@ -35,6 +35,12 @@
 
 # Реализованнное решение 
 
+## Демо проекта
+
+![Демо](./images/FullDemo.gif)
+
+Ссылка на гугл-диск с видео: https://drive.google.com/file/d/1LBWcQ9xXv1SjveuFxvzBjzlqing5KFrS/view
+
 ## Пример работы
 
 ![Пример работы 1](./images/1.jpg)
