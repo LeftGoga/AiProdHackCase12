@@ -5,9 +5,9 @@ import json
 class YandexTranslator:
     def __init__(
         self,
-        api_key="AQVN0XyMgY6NL_bWEWsBxiH5TBGTxzRqsrWkjSEg",
-        api_id="ajehfi6833kd5vrdc4bb",
-        folder_id="b1gjj01i0f670l2o8hrs",
+        api_key="Translator_key",
+        api_id="api_id",
+        folder_id="folder_id",
         target_language="ru",
     ):
         self.api_key = api_key
